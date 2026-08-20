@@ -1,0 +1,1812 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clearframe | Vidéos Explicatives SaaS FR</title>
+<meta name="description" content="Clearframe aide les SaaS B2B à rendre leur produit plus compréhensible sur leur homepage grâce à une vidéo explicative claire et packagée.">
+<link rel="icon" type="image/png" href="assets/img/favicon-180.png">
+<link rel="apple-touch-icon" href="assets/img/favicon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #030305;
+    --bg-elevated: #0A0A0F;
+    --bg-card: rgba(10,10,15,0.66);
+    --bg-card-hover: rgba(16,16,22,0.78);
+    --border: rgba(255,255,255,0.08);
+    --border-strong: rgba(255,255,255,0.16);
+    --text: #F8FAFC;
+    --text-dim: #94A3B8;
+    --text-dimmer: #5E6B7E;
+    --magenta: #E024FF;
+    --magenta-2: #D946EF;
+    --blue: #3B82F6;
+    --accent: var(--magenta);
+    --accent-2: var(--blue);
+    --accent-soft: rgba(224,36,255,0.12);
+    --accent-line: rgba(224,36,255,0.4);
+    --blue-soft: rgba(59,130,246,0.12);
+    --blue-line: rgba(59,130,246,0.4);
+    --radius: 16px;
+    --radius-sm: 10px;
+    --maxw: 1120px;
+    --glass-blur: 22px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1.55;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+    letter-spacing: -0.02em;
+    font-weight: 700;
+    line-height: 1.12;
+  }
+
+  a { color: inherit; text-decoration: none; }
+
+  img, svg { display: block; max-width: 100%; }
+
+  .wrap {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  section { position: relative; }
+
+  /* ===== Scroll-driven background video ===== */
+  .bg-video {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    z-index: -5;
+    background: var(--bg);
+    filter: saturate(1.15) brightness(0.9);
+  }
+  .bg-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: -4;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at 12% 0%, rgba(224,36,255,0.16), transparent 55%),
+      radial-gradient(circle at 88% 28%, rgba(59,130,246,0.14), transparent 55%),
+      linear-gradient(180deg, rgba(3,3,5,0.68) 0%, rgba(3,3,5,0.86) 45%, rgba(3,3,5,0.96) 100%);
+  }
+  /* Faint twinkling accent — kept subtle since the real background video already
+     carries the particle texture; this just adds a touch of sparkle in the gaps. */
+  .bg-stars {
+    position: fixed;
+    inset: -10% -10%;
+    z-index: -3;
+    pointer-events: none;
+    background-image: url('assets/img/stars-tile.png');
+    background-size: 340px 340px;
+    background-repeat: repeat;
+    opacity: 0.16;
+    animation: starsDrift 90s linear infinite;
+  }
+  @keyframes starsDrift {
+    0% { background-position: 0 0; }
+    100% { background-position: -680px 480px; }
+  }
+  /* Comet-trail streak, echoing the light trail under the logo wordmark */
+  .streak {
+    position: absolute;
+    z-index: 0;
+    height: 2px;
+    width: min(720px, 90vw);
+    background: linear-gradient(90deg, transparent, rgba(224,36,255,0.85) 35%, rgba(111,168,255,0.9) 65%, transparent);
+    filter: blur(1.5px);
+    box-shadow: 0 0 24px 3px rgba(224,36,255,0.45), 0 0 60px 10px rgba(59,130,246,0.25);
+    transform: rotate(-4deg);
+    pointer-events: none;
+  }
+  .streak::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: inherit;
+    filter: blur(10px);
+    opacity: 0.6;
+  }
+
+  /* Background ambience (foreground decorative glows, above scrim) */
+  .glow {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Animated gradient blob glowing behind a card's glass surface */
+  .blob-card {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .blob-card::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    width: 65%;
+    aspect-ratio: 1;
+    left: -10%;
+    top: -10%;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--magenta) 0%, var(--magenta-2) 45%, var(--blue) 100%);
+    filter: blur(38px);
+    opacity: 0.28;
+    animation: blobDrift 11s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes blobDrift {
+    0%   { transform: translate(0%, 0%); }
+    25%  { transform: translate(120%, 0%); }
+    50%  { transform: translate(120%, 110%); }
+    75%  { transform: translate(0%, 110%); }
+    100% { transform: translate(0%, 0%); }
+  }
+  .blob-card:nth-of-type(2)::before { animation-delay: -3.5s; }
+  .blob-card:nth-of-type(3)::before { animation-delay: -7s; }
+  .blob-card:nth-of-type(4)::before { animation-delay: -1.5s; }
+  @media (prefers-reduced-motion: reduce) {
+    .blob-card::before { animation: none; }
+  }
+
+  /* Nav */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(18px) saturate(150%);
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
+    background: rgba(3,3,5,0.62);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 17px;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    background: linear-gradient(90deg, var(--magenta) 0%, var(--magenta-2) 55%, #B980FF 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .logo-mark-img {
+    height: 22px;
+    width: auto;
+    filter: drop-shadow(0 0 10px rgba(224,36,255,0.55)) drop-shadow(0 0 20px rgba(59,130,246,0.25));
+  }
+  .nav-cta {
+    font-size: 14px;
+    font-weight: 600;
+    padding: 10px 22px;
+    border-radius: 100px;
+    background: var(--text);
+    color: #030305;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .nav-cta:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(224,36,255,0.3); }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    padding: 15px 30px;
+    border-radius: 100px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    border: 1px solid transparent;
+    cursor: pointer;
+  }
+  .btn-primary {
+    background: linear-gradient(90deg, var(--magenta) 0%, var(--magenta-2) 55%, #9B6BFF 100%);
+    color: #fff;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.25) inset, 0 8px 30px rgba(224,36,255,0.4);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 1px 0 rgba(255,255,255,0.3) inset, 0 14px 40px rgba(224,36,255,0.55); }
+  .btn-secondary {
+    background: rgba(10,10,15,0.5);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    color: var(--text);
+    border-color: var(--border-strong);
+  }
+  .btn-secondary:hover { background: rgba(255,255,255,0.05); border-color: var(--accent-line); }
+  .btn-block { width: 100%; justify-content: center; }
+
+  /* ShinyButton — rotating shimmer border, adapted to the magenta/blue palette */
+  @property --shiny-angle {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
+  }
+  .btn-shiny {
+    --shiny-angle: 0deg;
+    --shiny-percent: 6%;
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    border: 1px solid transparent;
+    color: #fff;
+    background:
+      linear-gradient(90deg, var(--magenta) 0%, var(--magenta-2) 55%, #9B6BFF 100%) padding-box,
+      conic-gradient(from var(--shiny-angle),
+        transparent,
+        rgba(255,255,255,0.9) var(--shiny-percent),
+        #fff calc(var(--shiny-percent) * 2),
+        rgba(255,255,255,0.9) calc(var(--shiny-percent) * 3),
+        transparent calc(var(--shiny-percent) * 4)
+      ) border-box;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.25), 0 8px 30px rgba(224,36,255,0.4);
+    animation: shinySpin 3.5s linear infinite;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, --shiny-percent 0.5s ease;
+  }
+  @keyframes shinySpin { to { --shiny-angle: 360deg; } }
+  .btn-shiny::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(120px 60px at 50% 130%, rgba(255,255,255,0.4), transparent 70%);
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    pointer-events: none;
+    z-index: -1;
+  }
+  .btn-shiny:hover, .btn-shiny:focus-visible {
+    --shiny-percent: 20%;
+    transform: translateY(-2px);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 14px 40px rgba(224,36,255,0.55);
+  }
+  .btn-shiny:hover::after { opacity: 1; }
+  @media (prefers-reduced-motion: reduce) {
+    .btn-shiny { animation: none; }
+  }
+
+  /* FlowButton — arrow slides through an expanding circle on hover */
+  .btn-flow {
+    position: relative;
+    overflow: hidden;
+    background: transparent;
+    color: var(--text);
+    border-color: var(--border-strong);
+  }
+  .btn-flow .flow-arrow {
+    position: absolute;
+    top: 50%;
+    translate: 0 -50%;
+    z-index: 2;
+    display: flex;
+    transition: all 800ms cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .btn-flow .flow-arrow-left { left: -25%; opacity: 0; }
+  .btn-flow .flow-arrow-right { right: 30px; opacity: 1; }
+  .btn-flow .flow-text {
+    position: relative;
+    z-index: 1;
+    transform: translateX(-12px);
+    transition: transform 800ms ease;
+  }
+  .btn-flow .flow-circle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--magenta), var(--blue));
+    opacity: 0;
+    z-index: 0;
+    transition: width 800ms cubic-bezier(0.19,1,0.22,1), height 800ms cubic-bezier(0.19,1,0.22,1), opacity 0.3s ease;
+  }
+  .btn-flow:hover { border-color: transparent; border-radius: 12px; }
+  .btn-flow:hover .flow-arrow-left { left: 16px; opacity: 1; }
+  .btn-flow:hover .flow-arrow-right { right: -25%; opacity: 0; }
+  .btn-flow:hover .flow-text { transform: translateX(12px); }
+  .btn-flow:hover .flow-circle { width: 220px; height: 220px; opacity: 1; }
+  .btn-flow:active { transform: scale(0.96); }
+
+  /* Reveal on scroll */
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.7s cubic-bezier(.2,.7,.3,1), transform 0.7s cubic-bezier(.2,.7,.3,1);
+  }
+  .reveal.in {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .reveal-delay-1 { transition-delay: 0.08s; }
+  .reveal-delay-2 { transition-delay: 0.16s; }
+  .reveal-delay-3 { transition-delay: 0.24s; }
+
+  /* Eyebrow / label */
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12.5px;
+    font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #F5A8FF;
+    background: var(--accent-soft);
+    border: 1px solid var(--accent-line);
+    padding: 6px 14px;
+    border-radius: 100px;
+    margin-bottom: 20px;
+  }
+
+  /* HERO */
+  .hero {
+    padding: 120px 0 100px;
+    text-align: center;
+  }
+  .hero-glow-1 { width: 600px; height: 600px; top: -200px; left: 50%; transform: translateX(-50%); background: radial-gradient(circle, rgba(224,36,255,0.22), transparent 70%); }
+  .hero h1 {
+    font-size: clamp(34px, 5.6vw, 62px);
+    max-width: 900px;
+    margin: 0 auto 26px;
+    position: relative;
+    z-index: 1;
+  }
+  .hero .sub {
+    font-size: clamp(16px, 2vw, 19px);
+    color: var(--text-dim);
+    max-width: 620px;
+    margin: 0 auto 40px;
+    position: relative;
+    z-index: 1;
+  }
+  .hero-actions {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Reserved slot for the upcoming VSL */
+  .hero-visual {
+    max-width: 880px;
+    margin: 72px auto 0;
+    position: relative;
+    z-index: 1;
+  }
+  .hero-frame {
+    border-radius: 20px;
+    border: 1px solid var(--border-strong);
+    background: rgba(10,10,15,0.55);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    padding: 6px;
+    box-shadow: 0 40px 100px rgba(0,0,0,0.65), 0 0 60px -10px rgba(224,36,255,0.2), 0 0 0 1px rgba(255,255,255,0.03);
+  }
+  .hero-frame-inner {
+    border-radius: 15px;
+    background: #000;
+    aspect-ratio: 16/9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-frame-inner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(135deg, rgba(224,36,255,0.18), transparent 60%),
+      linear-gradient(315deg, rgba(59,130,246,0.14), transparent 55%),
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.02) 0 1px, transparent 1px 40px);
+  }
+  .play-btn {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.2);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+  }
+  .play-btn svg { width: 22px; height: 22px; margin-left: 3px; }
+  .hero-caption {
+    text-align: center;
+    color: var(--text-dimmer);
+    font-size: 13px;
+    margin-top: 18px;
+  }
+  .vsl-title {
+    text-align: center;
+    font-size: clamp(22px, 3vw, 28px);
+    margin-bottom: 10px;
+  }
+  .vsl-subtitle {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 15px;
+    margin-bottom: 28px;
+  }
+  .vsl-video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Section shell */
+  .section {
+    padding: 100px 0;
+    border-top: 1px solid var(--border);
+  }
+  .section-head {
+    max-width: 640px;
+    margin: 0 auto 56px;
+    text-align: center;
+  }
+  .section-head.left {
+    text-align: left;
+    margin: 0 0 48px;
+  }
+  .section-head h2 {
+    font-size: clamp(28px, 3.6vw, 40px);
+    margin-bottom: 16px;
+  }
+  .section-head p {
+    color: var(--text-dim);
+    font-size: 17px;
+  }
+  .section-head p.section-note {
+    color: var(--text-dimmer);
+    font-size: 13.5px;
+    margin-top: 10px;
+  }
+
+  /* ANGLE FORT */
+  .angle {
+    text-align: center;
+    padding: 110px 0;
+  }
+  .angle-glow { width: 500px; height: 500px; top: 0; left: 50%; transform: translateX(-50%); background: radial-gradient(circle, rgba(59,130,246,0.2), transparent 70%); }
+  .angle blockquote {
+    position: relative;
+    z-index: 1;
+    font-size: clamp(24px, 4vw, 40px);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    max-width: 800px;
+    margin: 0 auto 20px;
+    line-height: 1.25;
+  }
+  .angle blockquote .hl {
+    background: linear-gradient(135deg, var(--magenta), var(--blue));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* PROBLEME */
+  .problem-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  .problem-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px 26px;
+    transition: border-color 0.2s ease, transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  }
+  .problem-card:hover {
+    border-color: var(--accent-line);
+    background: var(--bg-card-hover);
+    transform: translateY(-3px);
+    box-shadow: 0 20px 50px -25px rgba(224,36,255,0.35);
+  }
+  .problem-card .num {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 13px;
+    color: #F5A8FF;
+    margin-bottom: 18px;
+    display: inline-block;
+    border: 1px solid var(--accent-line);
+    background: var(--accent-soft);
+    width: 30px;
+    height: 30px;
+    line-height: 28px;
+    text-align: center;
+    border-radius: 8px;
+  }
+  .problem-card h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+  .problem-card p {
+    color: var(--text-dim);
+    font-size: 14.5px;
+  }
+
+  /* POUR QUI */
+  .forwho-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .forwho-card {
+    border-radius: var(--radius);
+    padding: 36px 30px;
+    border: 1px solid var(--border);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+  }
+  .forwho-card.yes {
+    background: linear-gradient(180deg, rgba(224,36,255,0.1), rgba(10,10,15,0.55));
+    border-color: var(--accent-line);
+  }
+  .forwho-card.no {
+    background: var(--bg-card);
+  }
+  .forwho-card h3 {
+    font-size: 17px;
+    margin-bottom: 22px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .forwho-card ul { list-style: none; }
+  .forwho-card li {
+    display: flex;
+    gap: 12px;
+    padding: 11px 0;
+    border-top: 1px solid var(--border);
+    font-size: 15px;
+    color: var(--text-dim);
+  }
+  .forwho-card li:first-of-type { border-top: none; }
+  .forwho-card.yes li { color: var(--text); }
+  .icon-badge {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .icon-badge.yes { background: var(--accent-soft); color: #F5A8FF; }
+  .icon-badge.no { background: rgba(255,255,255,0.06); color: var(--text-dimmer); }
+  .icon-badge svg { width: 12px; height: 12px; }
+
+  /* OFFRE — mise en avant avec bordure gradient animée */
+  .offer-featured {
+    position: relative;
+    border-radius: 28px;
+    padding: 2px;
+    background: linear-gradient(135deg, var(--magenta) 0%, var(--blue) 45%, var(--magenta-2) 75%, var(--blue) 100%);
+    background-size: 300% 300%;
+    animation: borderFlow 8s ease infinite;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.04), 0 30px 90px -20px rgba(224,36,255,0.45), 0 0 120px -30px rgba(59,130,246,0.4);
+  }
+  @keyframes borderFlow {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+  .offer-badge {
+    position: absolute;
+    top: -16px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #fff;
+    background: linear-gradient(135deg, var(--magenta), var(--blue));
+    padding: 8px 20px;
+    border-radius: 100px;
+    box-shadow: 0 8px 24px rgba(224,36,255,0.5);
+    white-space: nowrap;
+  }
+  .offer-card {
+    background: linear-gradient(180deg, rgba(10,10,15,0.94) 0%, rgba(6,6,10,0.98) 100%);
+    backdrop-filter: blur(calc(var(--glass-blur) + 6px));
+    -webkit-backdrop-filter: blur(calc(var(--glass-blur) + 6px));
+    border-radius: 26px;
+    padding: 52px 48px 48px;
+    position: relative;
+    overflow: hidden;
+  }
+  .offer-card::before {
+    content: '';
+    position: absolute;
+    top: -100px;
+    right: -100px;
+    width: 340px;
+    height: 340px;
+    background: radial-gradient(circle, rgba(224,36,255,0.25), transparent 70%);
+    pointer-events: none;
+  }
+  .offer-card::after {
+    content: '';
+    position: absolute;
+    bottom: -120px;
+    left: -80px;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(59,130,246,0.2), transparent 70%);
+    pointer-events: none;
+  }
+  .offer-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 24px;
+    margin-bottom: 36px;
+    position: relative;
+    z-index: 1;
+  }
+  .offer-name {
+    font-size: 26px;
+    margin-bottom: 8px;
+  }
+  .offer-desc { color: var(--text-dim); font-size: 15px; max-width: 420px; }
+  .offer-price {
+    text-align: right;
+  }
+  .offer-price .amount {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 44px;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #fff, #F5A8FF);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .offer-price .period { color: var(--text-dimmer); font-size: 13px; }
+
+  .offer-includes {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px 24px;
+    margin-bottom: 36px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+  }
+  .offer-includes li {
+    display: flex;
+    gap: 10px;
+    font-size: 14.5px;
+    color: var(--text);
+    align-items: flex-start;
+  }
+  .offer-includes svg { flex-shrink: 0; margin-top: 3px; width: 15px; height: 15px; color: #F5A8FF; }
+
+  .offer-cta-row {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .offer-note { color: var(--text-dimmer); font-size: 13px; }
+
+  .options-label {
+    position: relative;
+    z-index: 1;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: 12.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-dimmer);
+    margin: 4px 0 14px;
+  }
+  .options-row {
+    margin-top: 0;
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .option-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 20px 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    text-align: left;
+    width: 100%;
+    font-family: inherit;
+    color: inherit;
+    transition: border-color 0.18s ease, background 0.18s ease, transform 0.15s ease;
+  }
+  .option-card:hover { border-color: var(--border-strong); transform: translateY(-2px); }
+  .option-card .oicon {
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-dim);
+    transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+  }
+  .option-card .oicon svg { width: 17px; height: 17px; }
+  .option-card .ocheck {
+    margin-left: auto;
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1px solid var(--border-strong);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: transparent;
+    transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+  }
+  .option-card .ocheck svg { width: 12px; height: 12px; }
+  .option-card .otext { display: flex; flex-direction: column; gap: 4px; }
+  .option-card .oname { font-size: 14px; font-weight: 600; }
+  .option-card .oprice { color: #F5A8FF; font-size: 13px; font-weight: 700; }
+  .option-card.selected {
+    border-color: var(--accent-line);
+    background: var(--accent-soft);
+  }
+  .option-card.selected .oicon {
+    background: linear-gradient(135deg, var(--magenta), var(--blue));
+    border-color: transparent;
+    color: #fff;
+  }
+  .option-card.selected .ocheck {
+    background: linear-gradient(135deg, var(--magenta), var(--blue));
+    border-color: transparent;
+    color: #fff;
+  }
+  .offer-total-row {
+    position: relative;
+    z-index: 1;
+    margin-top: 20px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    padding-top: 18px;
+    border-top: 1px dashed var(--border-strong);
+  }
+  .offer-total-row .tlabel { color: var(--text-dim); font-size: 13.5px; }
+  .offer-total-row .tvalue {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 22px;
+    color: var(--text);
+  }
+  .offer-total-row .tvalue .digit { display: inline-block; }
+
+  .upgrade-banner {
+    margin-top: 20px;
+    position: relative;
+    z-index: 1;
+    border-radius: var(--radius-sm);
+    border: 1px dashed var(--border-strong);
+    padding: 22px 26px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+  .upgrade-banner .utitle { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
+  .upgrade-banner .udesc { color: var(--text-dim); font-size: 13.5px; }
+  .upgrade-banner .uprice { color: #6FA8FF; font-weight: 700; font-size: 15px; white-space: nowrap; }
+
+  /* BENEFICES */
+  .benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+  .benefit-card {
+    padding: 30px 26px;
+    border-radius: var(--radius);
+    background: var(--bg-card);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--border);
+  }
+  .benefit-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 11px;
+    background: var(--accent-soft);
+    border: 1px solid var(--accent-line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 18px;
+    color: #F5A8FF;
+  }
+  .benefit-icon svg { width: 20px; height: 20px; }
+  .benefit-card h3 { font-size: 16.5px; margin-bottom: 8px; }
+  .benefit-card p { color: var(--text-dim); font-size: 14.5px; }
+
+  /* PROCESS */
+  .process-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    position: relative;
+  }
+  .process-step {
+    position: relative;
+    padding: 34px 28px;
+    border-radius: var(--radius);
+    background: var(--bg-card);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--border);
+  }
+  .process-step .step-num {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-dimmer);
+    letter-spacing: 0.04em;
+    margin-bottom: 20px;
+  }
+  .process-step h3 { font-size: 19px; margin-bottom: 10px; }
+  .process-step p { color: var(--text-dim); font-size: 14.5px; }
+
+  /* EXEMPLES VIDEO */
+  .examples-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .example-card {
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+  }
+  .video-embed {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16/9;
+    background: #000;
+  }
+  .video-embed iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+  .example-meta {
+    padding: 18px 20px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .example-meta .ename { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 15px; }
+  .example-meta .etag { color: var(--text-dim); font-size: 13.5px; line-height: 1.5; }
+
+  /* OBJECTIONS */
+  .objections-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .objection-item {
+    background: var(--bg-card);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 24px 26px;
+  }
+  .objection-item .oq {
+    font-weight: 600;
+    font-size: 15.5px;
+    margin-bottom: 8px;
+    display: flex;
+    gap: 10px;
+  }
+  .objection-item .oq .mark { color: #F5A8FF; }
+  .objection-item .oa {
+    color: var(--text-dim);
+    font-size: 14.5px;
+    padding-left: 24px;
+  }
+
+  /* FAQ */
+  .faq-item {
+    border-bottom: 1px solid var(--border);
+  }
+  .faq-item:first-child { border-top: 1px solid var(--border); }
+  .faq-q {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 22px 4px;
+    background: none;
+    border: none;
+    color: var(--text);
+    font-family: 'Plus Jakarta Sans', inherit;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+  }
+  .faq-q .plus {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+    position: relative;
+    margin-left: 20px;
+  }
+  .faq-q .plus::before, .faq-q .plus::after {
+    content: '';
+    position: absolute;
+    background: var(--text-dim);
+    transition: transform 0.25s ease;
+  }
+  .faq-q .plus::before { width: 100%; height: 1.5px; top: 50%; left: 0; transform: translateY(-50%); }
+  .faq-q .plus::after { height: 100%; width: 1.5px; left: 50%; top: 0; transform: translateX(-50%); }
+  .faq-item.open .plus::after { transform: translateX(-50%) rotate(90deg); opacity: 0; }
+  .faq-a {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+  }
+  .faq-a-inner {
+    padding: 0 4px 22px;
+    color: var(--text-dim);
+    font-size: 14.5px;
+    max-width: 640px;
+  }
+  .faq-item.open .faq-a { max-height: 300px; }
+
+  /* POURQUOI CLEARFRAME */
+  .why-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+  }
+  .why-list { display: flex; flex-direction: column; gap: 26px; }
+  .why-item { display: flex; gap: 18px; }
+  .why-item .wnum {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    color: #F5A8FF;
+    font-size: 14px;
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    background: var(--accent-soft);
+    border: 1px solid var(--accent-line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .why-item h3 { font-size: 16px; margin-bottom: 6px; }
+  .why-item p { color: var(--text-dim); font-size: 14.5px; }
+
+  .why-visual {
+    border-radius: 20px;
+    border: 1px solid var(--border-strong);
+    background: linear-gradient(160deg, var(--bg-card), rgba(6,6,10,0.7));
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    padding: 40px;
+    position: relative;
+    overflow: hidden;
+    min-height: 380px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .why-visual::after {
+    content: '';
+    position: absolute;
+    width: 260px;
+    height: 260px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(224,36,255,0.28), transparent 70%);
+    top: -60px;
+    right: -60px;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .why-stat {
+    position: relative;
+    z-index: 1;
+    margin-bottom: 28px;
+  }
+  .why-stat:last-child { margin-bottom: 0; }
+  .why-stat .sval {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 36px;
+    background: linear-gradient(135deg, #F5A8FF, #6FA8FF);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    letter-spacing: -0.02em;
+  }
+  .why-stat .slabel {
+    color: var(--text-dim);
+    font-size: 14px;
+    margin-top: 4px;
+  }
+
+  /* CTA FINAL */
+  .final-cta {
+    text-align: center;
+    padding: 120px 0 130px;
+    position: relative;
+  }
+  .final-glow { width: 700px; height: 500px; bottom: -100px; left: 50%; transform: translateX(-50%); background: radial-gradient(circle, rgba(224,36,255,0.22), transparent 70%); }
+  .final-cta h2 {
+    font-size: clamp(30px, 4.6vw, 48px);
+    max-width: 760px;
+    margin: 0 auto 22px;
+    position: relative;
+    z-index: 1;
+  }
+  .final-cta p {
+    color: var(--text-dim);
+    font-size: 17px;
+    max-width: 520px;
+    margin: 0 auto 40px;
+    position: relative;
+    z-index: 1;
+  }
+  .final-cta-actions { position: relative; z-index: 1; }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 40px 0;
+  }
+  .footer-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .footer-row .flogo { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; }
+  .footer-row .fcopy { color: var(--text-dimmer); font-size: 13px; }
+  .footer-links { display: flex; gap: 22px; }
+  .footer-links a { color: var(--text-dimmer); font-size: 13px; transition: color 0.15s; }
+  .footer-links a:hover { color: var(--text); }
+  .footer-social { display: flex; gap: 14px; }
+  .footer-social a {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-dimmer);
+    border: 1px solid var(--border);
+    transition: color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+  }
+  .footer-social a:hover { color: var(--text); border-color: var(--accent-line); transform: translateY(-1px); }
+  .footer-social svg { width: 16px; height: 16px; }
+
+  /* RESPONSIVE */
+  @media (max-width: 860px) {
+    .problem-grid, .benefits-grid, .process-list, .options-row { grid-template-columns: 1fr; }
+    .forwho-grid { grid-template-columns: 1fr; }
+    .examples-grid { grid-template-columns: 1fr; }
+    .why-grid { grid-template-columns: 1fr; gap: 40px; }
+    .offer-includes { grid-template-columns: 1fr; }
+    .offer-top { flex-direction: column; }
+    .offer-price { text-align: left; }
+    .section { padding: 72px 0; }
+    .hero { padding: 96px 0 64px; }
+    .angle { padding: 80px 0; }
+    .final-cta { padding: 90px 0 100px; }
+    .offer-card { padding: 44px 24px 34px; }
+    .nav-cta { display: none; }
+    .bg-video { filter: saturate(1.15) brightness(0.75); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .offer-featured { animation: none; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Scroll-driven background video. No <source> on purpose: on mobile or a slow
+     connection we never want to fetch the file at all, so the real source is
+     only injected by JS once we've confirmed the device/connection can take it. -->
+<video id="bg-video" class="bg-video" muted playsinline preload="none" poster="assets/video/background-poster.jpg" data-src="assets/video/background.mp4"></video>
+<div class="bg-scrim"></div>
+<div class="bg-stars"></div>
+
+<header>
+  <div class="nav">
+    <div class="logo"><img src="assets/img/logo-mark.png" alt="Clearframe" class="logo-mark-img">Clearframe</div>
+    <a href="https://calendly.com/itsrnsk/30min" target="_blank" rel="noopener" class="nav-cta">Réserver un call</a>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="glow hero-glow-1"></div>
+  <div class="streak" style="top: 42%; left: 50%; transform: translateX(-50%) rotate(-4deg);"></div>
+  <div class="streak" style="top: 58%; left: 50%; width: min(560px, 75vw); opacity: 0.6; transform: translateX(-50%) rotate(5deg);"></div>
+  <div class="wrap">
+    <div class="reveal in">
+      <span class="eyebrow">Vidéos explicatives pour SaaS</span>
+    </div>
+    <h1 class="reveal in">Votre produit est bon. Encore faut-il que votre homepage le fasse comprendre rapidement.</h1>
+    <p class="sub reveal in reveal-delay-1">Clearframe aide les SaaS B2B à rendre leur produit plus compréhensible rapidement sur leur homepage grâce à une vidéo explicative claire et packagée.</p>
+    <div class="hero-actions reveal in reveal-delay-2">
+      <a href="https://calendly.com/itsrnsk/30min" target="_blank" rel="noopener" class="btn btn-shiny">
+        Réserver un call
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <a href="#exemples" class="btn btn-flow">
+        <span class="flow-arrow flow-arrow-left"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span class="flow-text">Voir des exemples</span>
+        <span class="flow-circle"></span>
+        <span class="flow-arrow flow-arrow-right"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </a>
+    </div>
+
+    <div class="hero-visual reveal in reveal-delay-3">
+      <h3 class="vsl-title">Regardez comment ça marche</h3>
+      <p class="vsl-subtitle">Une vidéo qui explique Clearframe en moins de 2 minutes</p>
+      <div class="hero-frame">
+        <div class="hero-frame-inner">
+          <video class="vsl-video" controls playsinline preload="metadata" poster="assets/video/vsl-poster.jpg">
+            <source src="assets/video/vsl.mp4" type="video/mp4">
+          </video>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ANGLE FORT -->
+<section class="section angle">
+  <div class="glow angle-glow"></div>
+  <div class="wrap">
+    <blockquote class="reveal">Beaucoup de SaaS <span class="hl">ne souffrent pas d'un manque de trafic.</span><br>Ils souffrent <span class="hl">d'un manque de clarté.</span></blockquote>
+  </div>
+</section>
+
+<!-- PROBLEME -->
+<section class="section" id="probleme">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">Le problème</span>
+      <h2>Beaucoup de SaaS ont un bon produit, mais une homepage qui ne l'explique pas assez vite</h2>
+      <p>Le résultat est toujours le même, qu'importe la qualité du produit derrière.</p>
+    </div>
+    <div class="problem-grid">
+      <div class="problem-card blob-card reveal">
+        <span class="num">01</span>
+        <h3>Le visiteur repart sans comprendre</h3>
+        <p>Il arrive, ne saisit pas assez vite ce que vous faites, et quitte la page sans agir.</p>
+      </div>
+      <div class="problem-card blob-card reveal reveal-delay-1">
+        <span class="num">02</span>
+        <h3>Vous réexpliquez à chaque call</h3>
+        <p>Le message n'est pas clair sur la homepage, donc c'est vous qui comblez le vide à l'oral.</p>
+      </div>
+      <div class="problem-card blob-card reveal reveal-delay-2">
+        <span class="num">03</span>
+        <h3>La page montre, mais n'explique pas</h3>
+        <p>Les éléments sont là, mais rien n'indique assez vite pourquoi votre produit est utile.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- POUR QUI / PAS POUR QUI -->
+<section class="section">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">Pour qui</span>
+      <h2>Clearframe est fait pour un profil précis</h2>
+      <p>Pas pour tout le monde. Et c'est volontaire.</p>
+    </div>
+    <div class="forwho-grid">
+      <div class="forwho-card blob-card yes reveal">
+        <h3><span class="icon-badge yes"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L4.5 8.5L10 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Clearframe est fait pour :</h3>
+        <ul>
+          <li><span class="icon-badge yes"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L4.5 8.5L10 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>les SaaS B2B déjà live</li>
+          <li><span class="icon-badge yes"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L4.5 8.5L10 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>les founders en early growth</li>
+          <li><span class="icon-badge yes"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L4.5 8.5L10 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>les produits encore mal expliqués sur la homepage</li>
+          <li><span class="icon-badge yes"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L4.5 8.5L10 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>les équipes sans marketing structuré</li>
+        </ul>
+      </div>
+      <div class="forwho-card blob-card no reveal reveal-delay-1">
+        <h3><span class="icon-badge no"><svg viewBox="0 0 12 12" fill="none"><path d="M3 3L9 9M9 3L3 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Clearframe n'est pas fait pour :</h3>
+        <ul>
+          <li><span class="icon-badge no"><svg viewBox="0 0 12 12" fill="none"><path d="M3 3L9 9M9 3L3 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>les projets pas encore lancés</li>
+          <li><span class="icon-badge no"><svg viewBox="0 0 12 12" fill="none"><path d="M3 3L9 9M9 3L3 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>les offres très early ou « juste test »</li>
+          <li><span class="icon-badge no"><svg viewBox="0 0 12 12" fill="none"><path d="M3 3L9 9M9 3L3 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>les boîtes avec une équipe marketing déjà structurée</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- OFFRE -->
+<section class="section" id="offre">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">L'offre</span>
+      <h2>Un livrable précis, pas un abonnement</h2>
+      <p>Une offre unique, packagée, avec un délai clair fixé dès le départ.</p>
+    </div>
+
+    <div class="offer-featured reveal">
+      <span class="offer-badge">★ Notre offre principale</span>
+      <div class="offer-card">
+        <div class="offer-top">
+          <div>
+            <h3 class="offer-name">Homepage Explainer</h3>
+            <p class="offer-desc">Une vidéo explicative pensée pour aider un visiteur à comprendre plus vite votre produit sur votre homepage.</p>
+          </div>
+          <div class="offer-price">
+            <div class="amount">990€</div>
+            <div class="period">forfait unique</div>
+          </div>
+        </div>
+
+        <ul class="offer-includes">
+          <li><svg viewBox="0 0 16 16" fill="none"><path d="M2.5 8.5L6 12L13.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>audit messaging</li>
+          <li><svg viewBox="0 0 16 16" fill="none"><path d="M2.5 8.5L6 12L13.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>clarification de l'angle</li>
+          <li><svg viewBox="0 0 16 16" fill="none"><path d="M2.5 8.5L6 12L13.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>script</li>
+          <li><svg viewBox="0 0 16 16" fill="none"><path d="M2.5 8.5L6 12L13.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>storyboard simple</li>
+          <li><svg viewBox="0 0 16 16" fill="none"><path d="M2.5 8.5L6 12L13.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>production vidéo</li>
+          <li><svg viewBox="0 0 16 16" fill="none"><path d="M2.5 8.5L6 12L13.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>sous-titres</li>
+          <li><svg viewBox="0 0 16 16" fill="none"><path d="M2.5 8.5L6 12L13.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>2 retours</li>
+        </ul>
+
+        <div class="offer-cta-row">
+          <a href="https://calendly.com/itsrnsk/30min" target="_blank" rel="noopener" class="btn btn-shiny">Réserver un call</a>
+          <span class="offer-note">Sans engagement — 30 minutes pour valider si c'est pertinent</span>
+        </div>
+
+        <p class="options-label">Ajouter des options</p>
+        <div class="options-row" id="options-row">
+          <button type="button" class="option-card blob-card" data-price="190">
+            <span class="oicon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 8L12 3L20 8V16L12 21L4 16V8Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M4 8L12 13L20 8M12 13V21" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></span>
+            <span class="otext">
+              <span class="oname">Hook Clarity</span>
+              <span class="oprice">+190€</span>
+            </span>
+            <span class="ocheck"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L4.5 8.5L10 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </button>
+          <button type="button" class="option-card blob-card" data-price="190">
+            <span class="oicon"><svg viewBox="0 0 24 24" fill="none"><rect x="2.5" y="5.5" width="19" height="13" rx="4" stroke="currentColor" stroke-width="1.6"/><path d="M10.2 9.5L14.5 12L10.2 14.5V9.5Z" fill="currentColor"/></svg></span>
+            <span class="otext">
+              <span class="oname">Cut Ads / LinkedIn</span>
+              <span class="oprice">+190€</span>
+            </span>
+            <span class="ocheck"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L4.5 8.5L10 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </button>
+          <button type="button" class="option-card blob-card" data-price="90">
+            <span class="oicon"><svg viewBox="0 0 24 24" fill="none"><rect x="7" y="2.5" width="10" height="19" rx="2.5" stroke="currentColor" stroke-width="1.6"/><path d="M11 18H13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span>
+            <span class="otext">
+              <span class="oname">Mobile Formats</span>
+              <span class="oprice">+90€</span>
+            </span>
+            <span class="ocheck"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L4.5 8.5L10 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </button>
+        </div>
+
+        <div class="offer-total-row">
+          <span class="tlabel">Total avec options sélectionnées</span>
+          <span class="tvalue"><span id="offer-total">990</span>€</span>
+        </div>
+
+        <div class="upgrade-banner">
+          <div>
+            <div class="utitle">Clarity Expansion</div>
+            <div class="udesc">Pour étendre la clarté à un autre point de contact : ads, onboarding, V2, lancement ou Product Hunt.</div>
+          </div>
+          <div class="uprice">Dès 790€</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BENEFICES -->
+<section class="section">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">Bénéfices</span>
+      <h2>Ce que ça change concrètement</h2>
+      <p>Pas juste une vidéo. Une homepage qui convertit mieux.</p>
+    </div>
+    <div class="benefits-grid">
+      <div class="benefit-card blob-card reveal">
+        <div class="benefit-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 4V2M12 22V20M4 12H2M22 12H20M6.3 6.3L4.9 4.9M17.7 6.3L19.1 4.9M6.3 17.7L4.9 19.1M17.7 17.7L19.1 19.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.6"/></svg></div>
+        <h3>Un produit plus facile à comprendre</h3>
+        <p>Le visiteur saisit ce que vous faites sans effort, dès les premières secondes.</p>
+      </div>
+      <div class="benefit-card blob-card reveal reveal-delay-1">
+        <div class="benefit-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M3 17L9 11L13 15L21 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 7H21V13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <h3>Une homepage qui travaille pour vous</h3>
+        <p>Elle convertit sans que vous ayez à intervenir sur chaque visite.</p>
+      </div>
+      <div class="benefit-card blob-card reveal reveal-delay-2">
+        <div class="benefit-icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 7V12L15 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <h3>Moins de temps à réexpliquer</h3>
+        <p>Vous arrêtez de combler à l'oral ce que la page ne dit pas déjà.</p>
+      </div>
+      <div class="benefit-card blob-card reveal">
+        <div class="benefit-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 4H20V16H4V4Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M8 20H16M12 16V20" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+        <h3>Un support clair et réutilisable</h3>
+        <p>La vidéo sert sur la homepage, en ads, en démo commerciale, en onboarding.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section class="section" id="process">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">Process</span>
+      <h2>Comment ça se passe</h2>
+      <p>Un processus simple, sans allers-retours interminables.</p>
+    </div>
+    <div class="process-list">
+      <div class="process-step blob-card reveal">
+        <div class="step-num">ÉTAPE 01</div>
+        <h3>Comprendre</h3>
+        <p>On échange sur votre produit, votre cible et ce qu'un visiteur comprend actuellement sur votre homepage.</p>
+      </div>
+      <div class="process-step blob-card reveal reveal-delay-1">
+        <div class="step-num">ÉTAPE 02</div>
+        <h3>Clarifier</h3>
+        <p>On définit le bon angle, puis on construit le script et la structure de la vidéo.</p>
+      </div>
+      <div class="process-step blob-card reveal reveal-delay-2">
+        <div class="step-num">ÉTAPE 03</div>
+        <h3>Produire</h3>
+        <p>On réalise la vidéo, vous faites vos retours, puis on livre une version finale prête à être utilisée.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EXEMPLES VIDEO -->
+<section class="section" id="exemples">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">Portfolio</span>
+      <h2>Premiers exemples</h2>
+      <p>Chaque vidéo est pensée pour faire comprendre le produit plus vite, pas juste pour faire joli.</p>
+      <p class="section-note">Créées en autonomie pour démontrer l'approche — les prochains projets seront des mandats clients.</p>
+    </div>
+    <div class="examples-grid">
+      <div class="example-card blob-card reveal">
+        <div class="video-embed">
+          <iframe src="https://www.youtube-nocookie.com/embed/DWU4BwviEYs?rel=0&amp;loop=0&amp;controls=1&amp;cc_load_policy=0&amp;autoplay=0" title="Sendshort.ai — vidéo explicative" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <div class="example-meta">
+          <span class="ename">Sendshort.ai</span>
+          <span class="etag">Vidéo explicative réalisée pour clarifier la proposition de valeur d'un outil de création de shorts par IA.</span>
+        </div>
+      </div>
+      <div class="example-card blob-card reveal reveal-delay-1">
+        <div class="video-embed">
+          <iframe src="https://www.youtube-nocookie.com/embed/sUb6zvLkelo?rel=0&amp;loop=0&amp;controls=1&amp;cc_load_policy=0&amp;autoplay=0" title="Fructu.co — vidéo explicative" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <div class="example-meta">
+          <span class="ename">Fructu.co</span>
+          <span class="etag">Vidéo explicative réalisée pour clarifier la proposition de valeur d'un CRM B2B.</span>
+        </div>
+      </div>
+      <div class="example-card blob-card reveal reveal-delay-2">
+        <div class="video-embed">
+          <iframe src="https://www.youtube-nocookie.com/embed/XkEjU8fX2L4?rel=0&amp;loop=0&amp;controls=1&amp;cc_load_policy=0&amp;autoplay=0" title="Exercice de style : Interface UI" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <div class="example-meta">
+          <span class="ename">Exercice de style : Interface UI</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- OBJECTIONS -->
+<section class="section">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">Objections</span>
+      <h2>Ce qu'on se demande souvent avant de se lancer</h2>
+    </div>
+    <div class="objections-list">
+      <div class="objection-item blob-card reveal">
+        <div class="oq"><span class="mark">—</span>« Une vidéo, ce n'est pas prioritaire »</div>
+        <div class="oa">Si votre produit est encore mal compris sur la homepage, clarifier ce point est souvent plus urgent que d'envoyer plus de trafic sur une page floue.</div>
+      </div>
+      <div class="objection-item blob-card reveal reveal-delay-1">
+        <div class="oq"><span class="mark">—</span>« Je peux le faire moi-même »</div>
+        <div class="oa">Vous pouvez, mais vous êtes souvent trop proche de votre produit pour le regarder comme un visiteur froid. C'est précisément là que le flou reste.</div>
+      </div>
+      <div class="objection-item blob-card reveal reveal-delay-2">
+        <div class="oq"><span class="mark">—</span>« 990€, c'est beaucoup »</div>
+        <div class="oa">Le vrai coût, c'est de continuer à envoyer des visiteurs vers une homepage qui ne fait pas bien comprendre votre produit.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="section" id="faq">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">FAQ</span>
+      <h2>Questions fréquentes</h2>
+    </div>
+    <div style="max-width:720px;margin:0 auto;">
+      <div class="faq-item reveal">
+        <button class="faq-q">Est-ce que vous faites aussi le script ?<span class="plus"></span></button>
+        <div class="faq-a"><div class="faq-a-inner">Oui. Le script est inclus dans l'offre.</div></div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-q">Est-ce adapté si mon produit est encore en construction ?<span class="plus"></span></button>
+        <div class="faq-a"><div class="faq-a-inner">Non. Clearframe est pensé pour des produits déjà live.</div></div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-q">Quel est le format ?<span class="plus"></span></button>
+        <div class="faq-a"><div class="faq-a-inner">Une vidéo explicative pensée pour la homepage.</div></div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-q">En combien de temps la vidéo est-elle livrée ?<span class="plus"></span></button>
+        <div class="faq-a"><div class="faq-a-inner">Le délai est confirmé dès la validation du brief.</div></div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-q">Est-ce adapté si j'ai peu de trafic ?<span class="plus"></span></button>
+        <div class="faq-a"><div class="faq-a-inner">Oui, si votre homepage manque encore de clarté. Le sujet n'est pas seulement le volume de trafic, mais ce que comprend le visiteur une fois arrivé.</div></div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-q">Quelle différence avec un freelance vidéo classique ?<span class="plus"></span></button>
+        <div class="faq-a"><div class="faq-a-inner">Clearframe ne commence pas par « faire une vidéo ». Le travail commence par clarifier le message, l'angle et ce que le visiteur doit comprendre.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- POURQUOI CLEARFRAME -->
+<section class="section">
+  <div class="wrap">
+    <div class="why-grid">
+      <div>
+        <div class="section-head left reveal">
+          <span class="eyebrow">Pourquoi Clearframe</span>
+          <h2>Une offre, un focus, un résultat mesurable</h2>
+        </div>
+        <div class="why-list">
+          <div class="why-item reveal">
+            <div class="wnum">01</div>
+            <div><h3>On ne fait qu'une chose</h3><p>Pas de branding flou, pas de production « jolie mais vide ». Une seule offre, pensée pour un seul objectif : la clarté produit sur votre homepage.</p></div>
+          </div>
+          <div class="why-item reveal reveal-delay-1">
+            <div class="wnum">02</div>
+            <div><h3>La stratégie avant la caméra</h3><p>L'angle et le script sont travaillés en amont. La vidéo n'est que la conséquence d'un message déjà clair.</p></div>
+          </div>
+          <div class="why-item reveal reveal-delay-2">
+            <div class="wnum">03</div>
+            <div><h3>Un livrable, pas un abonnement</h3><p>Prix fixe, délai fixe, portée définie. Un message clair, une vidéo courte, un objectif simple : mieux convertir.</p></div>
+          </div>
+        </div>
+      </div>
+      <div class="why-visual blob-card reveal reveal-delay-2">
+        <div class="why-stat">
+          <div class="sval">3 étapes</div>
+          <div class="slabel">comprendre, clarifier, produire — rien de superflu</div>
+        </div>
+        <div class="why-stat">
+          <div class="sval">2 retours</div>
+          <div class="slabel">inclus dans l'offre, sans frais cachés</div>
+        </div>
+        <div class="why-stat">
+          <div class="sval">1 offre</div>
+          <div class="slabel">focalisée sur la clarté, pas la production généraliste</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA FINAL -->
+<section class="final-cta">
+  <div class="glow final-glow"></div>
+  <div class="streak" style="top: 30%; left: 50%; transform: translateX(-50%) rotate(-4deg);"></div>
+  <div class="wrap">
+    <h2 class="reveal">Vous voulez savoir si votre homepage fait vraiment comprendre votre produit rapidement ?</h2>
+    <p class="reveal reveal-delay-1">Je peux vous faire un retour rapide et vous dire si une vidéo explicative a du sens pour votre cas.</p>
+    <div class="final-cta-actions reveal reveal-delay-2">
+      <a href="https://calendly.com/itsrnsk/30min" target="_blank" rel="noopener" class="btn btn-shiny">
+        Réserver un call
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-row">
+      <div class="flogo"><img src="assets/img/logo-mark.png" alt="Clearframe" class="logo-mark-img" style="height:16px;width:auto;">Clearframe</div>
+      <div class="footer-links">
+        <a href="#offre">Offre</a>
+        <a href="#process">Process</a>
+        <a href="#exemples">Exemples</a>
+        <a href="#faq">FAQ</a>
+      </div>
+      <!-- Réseaux sociaux — remplacer les href="#" par les vraies URLs -->
+      <div class="footer-social">
+        <a href="https://www.instagram.com/__r_n_s_k__/#" aria-label="Instagram" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.6"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor"/></svg></a>
+        <a href="http://www.youtube.com/@RNSK1vision" aria-label="YouTube" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none"><rect x="2.5" y="5.5" width="19" height="13" rx="4" stroke="currentColor" stroke-width="1.6"/><path d="M10.5 9.5L15 12L10.5 14.5V9.5Z" fill="currentColor"/></svg></a>
+        <a href="https://www.linkedin.com/in/matth%C3%A9o-v-a590a4278?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app" aria-label="LinkedIn" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.6"/><path d="M7.5 10V17M7.5 7.2V7.21M11.5 17V10M11.5 13C11.5 11 13 10 14.5 10C16 10 16.8 11 16.8 13V17" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></a>
+        <a href="mailto:contact@clearframe.agency" aria-label="Email"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="3" stroke="currentColor" stroke-width="1.6"/><path d="M4 7.5L12 13L20 7.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      </div>
+      <div class="fcopy">© 2026 Clearframe. Tous droits réservés.</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Scroll reveal
+  const revealEls = document.querySelectorAll('.reveal:not(.in)');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in');
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+  revealEls.forEach(el => io.observe(el));
+
+  // FAQ accordion
+  document.querySelectorAll('.faq-item').forEach(item => {
+    const q = item.querySelector('.faq-q');
+    q.addEventListener('click', () => {
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(other => {
+        if (other !== item) other.classList.remove('open');
+      });
+      item.classList.toggle('open', !isOpen);
+    });
+  });
+
+  // ===== Offer options: toggle add-ons and animate the running total =====
+  (function () {
+    const BASE_PRICE = 990;
+    const totalEl = document.getElementById('offer-total');
+    const optionCards = document.querySelectorAll('#options-row .option-card');
+    if (!totalEl || !optionCards.length) return;
+
+    let displayedValue = BASE_PRICE;
+    let animFrame = null;
+
+    function currentTotal() {
+      let sum = BASE_PRICE;
+      optionCards.forEach(card => {
+        if (card.classList.contains('selected')) sum += Number(card.dataset.price);
+      });
+      return sum;
+    }
+
+    function animateTo(target) {
+      if (animFrame) cancelAnimationFrame(animFrame);
+      const start = displayedValue;
+      const startTime = performance.now();
+      const duration = 420;
+
+      function step(now) {
+        const t = Math.min((now - startTime) / duration, 1);
+        const eased = 1 - Math.pow(1 - t, 3);
+        displayedValue = Math.round(start + (target - start) * eased);
+        totalEl.textContent = displayedValue.toLocaleString('fr-FR');
+        if (t < 1) {
+          animFrame = requestAnimationFrame(step);
+        } else {
+          displayedValue = target;
+          totalEl.textContent = target.toLocaleString('fr-FR');
+        }
+      }
+      animFrame = requestAnimationFrame(step);
+    }
+
+    optionCards.forEach(card => {
+      card.setAttribute('aria-pressed', 'false');
+      card.addEventListener('click', () => {
+        const nowSelected = !card.classList.contains('selected');
+        card.classList.toggle('selected', nowSelected);
+        card.setAttribute('aria-pressed', String(nowSelected));
+        animateTo(currentTotal());
+      });
+    });
+  })();
+
+  // ===== Scrollytelling: bind page scroll progress to video currentTime =====
+  // Note: the source video is encoded all-intra (one keyframe per frame) so that
+  // arbitrary seeks land on an exact frame instead of decoding forward from a
+  // distant keyframe — that decode cost was the main cause of scrub stutter.
+  (function () {
+    const video = document.getElementById('bg-video');
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Small screens and constrained connections skip the video entirely — the
+    // poster stays as a static background and nothing is ever fetched. This
+    // check is separate from prefers-reduced-motion, which still loads the
+    // video but skips the easing (unchanged below).
+    const isSmallScreen = window.matchMedia('(max-width: 859px)').matches;
+    const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    const saveData = !!(conn && conn.saveData);
+    const isSlowConnection = !!(conn && /^(slow-2g|2g|3g)$/.test(conn.effectiveType || ''));
+    const skipVideo = isSmallScreen || saveData || isSlowConnection;
+
+    if (skipVideo) return; // poster.jpg stays as the background, no video ever loads
+
+    let duration = 0;
+    let ready = false;
+    let targetTime = 0;
+    let displayTime = 0;
+    let seekPending = false;
+
+    function scrollProgress() {
+      const scrollTop = window.scrollY || document.documentElement.scrollTop;
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      if (maxScroll <= 0) return 0;
+      return Math.min(Math.max(scrollTop / maxScroll, 0), 1);
+    }
+
+    function markReady() {
+      if (ready) return;
+      duration = video.duration || 0;
+      if (duration > 0) {
+        ready = true;
+        video.pause();
+        updateTarget();
+      }
+    }
+
+    function updateTarget() {
+      if (!ready) return;
+      targetTime = scrollProgress() * duration;
+      if (reduceMotion) {
+        displayTime = targetTime;
+        seekTo(displayTime);
+      }
+    }
+
+    // Never issue a new seek while the previous one is still resolving —
+    // stacking currentTime writes is what makes the video visibly lag behind
+    // the scroll position instead of tracking it 1:1.
+    function seekTo(t) {
+      if (seekPending) return;
+      const clamped = Math.min(Math.max(t, 0), duration || 0);
+      if (Math.abs(video.currentTime - clamped) < 0.008) return;
+      seekPending = true;
+      video.currentTime = clamped;
+    }
+
+    function tick() {
+      if (ready && !reduceMotion) {
+        // Ease toward the target time so fast flicks don't feel like a hard jump cut
+        displayTime += (targetTime - displayTime) * 0.16;
+        seekTo(displayTime);
+      }
+      requestAnimationFrame(tick);
+    }
+
+    function startScrubbing() {
+      video.addEventListener('seeked', () => { seekPending = false; });
+      video.addEventListener('loadedmetadata', markReady);
+      video.addEventListener('durationchange', markReady);
+      video.addEventListener('canplay', markReady);
+      window.addEventListener('scroll', updateTarget, { passive: true });
+      window.addEventListener('resize', updateTarget);
+      requestAnimationFrame(tick);
+    }
+
+    // Defer fetching background.mp4 until the visitor actually scrolls, so it
+    // never competes with fonts/HTML for bandwidth during first paint.
+    function loadVideoSource() {
+      const source = document.createElement('source');
+      source.src = video.dataset.src;
+      source.type = 'video/mp4';
+      video.appendChild(source);
+      video.load();
+      startScrubbing();
+    }
+
+    window.addEventListener('scroll', loadVideoSource, { passive: true, once: true });
+  })();
+</script>
+
+</body>
+</html>
