@@ -720,6 +720,21 @@
     color: transparent;
   }
   .offer-price .period { color: var(--text-dimmer); font-size: 13px; }
+  .offer-price .price-row { display: flex; align-items: baseline; justify-content: flex-end; gap: 10px; }
+  .offer-price .amount-old {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: 22px;
+    color: var(--text-dimmer);
+    text-decoration: line-through;
+  }
+  .offer-price .launch-tag {
+    display: block;
+    margin-top: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--magenta);
+  }
 
   .offer-includes {
     position: relative;
@@ -749,6 +764,13 @@
     align-items: center;
   }
   .offer-note { color: var(--text-dimmer); font-size: 13px; }
+  .launch-note {
+    position: relative;
+    z-index: 1;
+    color: var(--text-dimmer);
+    font-size: 12.5px;
+    margin-top: 10px;
+  }
 
   .options-label {
     position: relative;
@@ -1330,7 +1352,11 @@
             <p class="offer-desc">Une vidéo explicative pensée pour aider un visiteur à comprendre plus vite votre produit sur votre homepage.</p>
           </div>
           <div class="offer-price">
-            <div class="amount">990€</div>
+            <div class="price-row">
+              <span class="amount-old">990€</span>
+              <span class="amount">490€</span>
+            </div>
+            <span class="launch-tag">Tarif de lancement, valable pour les 3 premiers clients</span>
             <div class="period">forfait unique</div>
           </div>
         </div>
@@ -1349,6 +1375,7 @@
           <a href="https://calendly.com/itsrnsk/30min" target="_blank" rel="noopener" class="btn btn-shiny">Réserver un call</a>
           <span class="offer-note">Sans engagement — 30 minutes pour valider si c'est pertinent</span>
         </div>
+        <p class="launch-note">Offre de lancement limitée aux 3 premiers projets Cuelens, pour construire mes premiers cas concrets. Le tarif repasse à 990€ ensuite.</p>
 
         <p class="options-label">Ajouter des options</p>
         <div class="options-row" id="options-row">
@@ -1380,7 +1407,7 @@
 
         <div class="offer-total-row">
           <span class="tlabel">Total avec options sélectionnées</span>
-          <span class="tvalue"><span id="offer-total">990</span>€</span>
+          <span class="tvalue"><span id="offer-total">490</span>€</span>
         </div>
 
         <div class="upgrade-banner">
@@ -1663,7 +1690,7 @@
 
   // ===== Offer options: toggle add-ons and animate the running total =====
   (function () {
-    const BASE_PRICE = 990;
+    const BASE_PRICE = 490;
     const totalEl = document.getElementById('offer-total');
     const optionCards = document.querySelectorAll('#options-row .option-card');
     if (!totalEl || !optionCards.length) return;
